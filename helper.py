@@ -19,6 +19,8 @@ class MNIST():
         self._validation_labels = self._training_labels[random_indices]
         self._training_data = np.delete(self._training_data, random_indices, axis = 0)
         self._training_labels = np.delete(self._training_labels, random_indices)
+
+        self._create_class_map()
     
     def _load_binaries(self, file_name):
         path = os.path.join(self._directory, file_name)
@@ -74,6 +76,33 @@ class MNIST():
         random_indices = np.random.choice(len(self._training_labels), num_samples, replace = False)
         return self._training_data[random_indices], self._training_labels[random_indices]
 
-    
-        
-    
+    def _create_class_map(self):
+        """
+        create a list with 10 entries, belonging to the 10 classes. Each entry contains a list of all
+        data points with the corresponding class. This function is applied on the training-set only
+        :return:
+        """
+        class_map = []
+        for i in range(10):
+            class_map.append(self._training_data[self._training_labels == i])
+        self.class_map = class_map
+
+    def get_classification_samples(self, n_samples_per_class):
+        """
+        return a data-vector with n samples per class, used for one shot classification
+        :param n_samples_per_class:
+        :return:
+        """
+        data = []
+        labels = []
+
+        for i,class_samples in enumerate(self.class_map):
+            random_indices = np.random.choice(len(class_samples),n_samples_per_class,replace=False)
+            data.append(class_samples[random_indices])
+            labels.append(np.ones(n_samples_per_class)*i)
+        return np.asarray(data), np.asarray(labels)
+
+
+
+
+
