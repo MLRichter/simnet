@@ -48,6 +48,7 @@ with tf.variable_scope('Loss_Metrics_and_Training'):
 
     # calculate the accuracy
     predicted_class = tf.greater(tf.nn.sigmoid(logits),0.5)
+    sigmoidal_out = tf.nn.sigmoid(logits)
     correct = tf.equal(predicted_class, tf.equal(Y,1.0))
     accuracy = tf.reduce_mean( tf.cast(correct, 'float') )
 
@@ -123,31 +124,40 @@ with tf.Session() as sess:
     plt.plot(list(range(len(loss_list))),loss_list)
  #   plt.show()
 
+    def get_mean_prediction(predictions, y):
+        score_map = []
+        for i in range(10):
+            c_pred = predictions[y == i]
+            m = np.mean(c_pred)
+            score_map.append(m)
+        return np.argmin(score_map)
+
     # CLASSIFICATION SEGMENT
     test_acc = []
-    samples_per_shot = 1024# half_batch
+    samples_per_shot = 100
     total_data_processed = 0.0
     correct = 0.0
+    correct_avg = 0.0
     for data, labels in m.get_test_batch(batch_size):
         data = data.reshape((data.shape[0],28,28,1))
         print('[INFO] processing',total_data_processed,'of',m.get_sizes()[2])
 
         #calssify a single sample
         for i in range(len(data)):
-            x1, y1 = m.get_samples(samples_per_shot)
-            x1 = x1.reshape((x1.shape[0],28,28,1))
+            x1, y1 = m.get_classification_samples(samples_per_shot // 10)
             x2 = np.asarray([list(data[i])] * samples_per_shot)
-            #print(x2.shape)
-            y2 = np.asarray([labels[i]] * samples_per_shot)
-            y = np.zeros((samples_per_shot,1))
-            y[y1 == y2] = 0.0
-            y[y1 != y2] = 1.0
-            pc = sess.run([predicted_class],feed_dict={X1:x1,X2:x2,Y:y})
+
+            pc = sess.run([sigmoidal_out],feed_dict={X1:x1,X2:x2})
             prediction = y1[np.argmin(pc)]
-            #print('y:',prediction, 'label:',labels[i])
+            prediction_avg = get_mean_prediction(np.squeeze(pc),y1)
+
             if prediction == labels[i]:
                 correct += 1.0
+            if prediction_avg == labels[i]:
+                correct_avg += 1.0
             total_data_processed += 1.0
         # keep track of loss and accuracy
     accuracy = correct / total_data_processed
-    print('Classification Accuracy:', accuracy)
+    avg_acc = correct_avg / total_data_processed
+    print('Classification Accuracy:  ', accuracy)
+    print('Averaging Sample Accuracy:', avg_acc)

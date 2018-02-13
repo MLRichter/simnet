@@ -93,14 +93,19 @@ class MNIST():
         :param n_samples_per_class:
         :return:
         """
-        data = []
-        labels = []
+        data = None
+        labels = None
 
         for i,class_samples in enumerate(self.class_map):
             random_indices = np.random.choice(len(class_samples),n_samples_per_class,replace=False)
-            data.append(class_samples[random_indices])
-            labels.append(np.ones(n_samples_per_class)*i)
-        return np.asarray(data), np.asarray(labels)
+            if type(data) != type(None):
+               # print(data.shape, labels.shape)
+                data = np.vstack((data,class_samples[random_indices]))
+                labels = np.hstack((labels,np.ones(n_samples_per_class)*i))
+            else:
+                data = class_samples[random_indices]
+                labels = np.ones(n_samples_per_class)*i
+        return data.reshape(data.shape[0], data.shape[1],data.shape[2],1), np.asarray(labels)
 
 
 
