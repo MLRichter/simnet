@@ -67,7 +67,9 @@ l = 0.0
 init = tf.global_variables_initializer()
 with tf.Session() as sess:
     sess.run(init)
-
+    v_loss_list = []
+    v_acc_list = []
+    i = 0
     for epoch in range(epochs):
         m = MNIST('.')
         print('[INFO] Epoch:',epoch,l)
@@ -91,26 +93,32 @@ with tf.Session() as sess:
             _,l = sess.run([train_step,loss],feed_dict={X1:x1,X2:x2,Y:y})
             loss_list.append(l)
 
-    # test model on validation data
-    for data, labels in m.get_validation_batch(batch_size):
+            if i%100 == 0:
+                v_loss = []
+                v_acc = []
+                # test model on validation data
+                for data, labels in m.get_validation_batch(batch_size):
 
-        # same code as in the training loop
-        data = data.reshape((data.shape[0],28,28,1))
-        x1 = data[:half_batch]
-        x2 = data[half_batch:]
-        y = np.zeros((half_batch,1))
-        y1 = labels[:half_batch]
-        y2 = labels[half_batch:]
-        y[y1 == y2] = 0.0
-        y[y1 != y2] = 1.0
-        pc,l,a = sess.run([predicted_class,loss,accuracy],feed_dict={X1:x1,X2:x2,Y:y})
+                    # same code as in the training loop
+                    data = data.reshape((data.shape[0],28,28,1))
+                    x1 = data[:half_batch]
+                    x2 = data[half_batch:]
+                    y = np.zeros((half_batch,1))
+                    y1 = labels[:half_batch]
+                    y2 = labels[half_batch:]
+                    y[y1 == y2] = 0.0
+                    y[y1 != y2] = 1.0
+                    pc,l,a = sess.run([predicted_class,loss,accuracy],feed_dict={X1:x1,X2:x2,Y:y})
 
-        # keep track of loss and accuracy
-        loss_list.append(l)
-        acc_list.append(a)
+                    # keep track of loss and accuracy
+                    v_loss.append(l)
+                    v_acc.append(a)
+                v_loss_list += [np.mean(v_loss)]*100
+                v_acc_list += [np.mean(v_acc)]*100
+            i += 1
 
-    # print the mena accuracy over the test-set
-    print('Acc:',np.mean(acc_list))
+    # print the mean accuracy over the test-set
+    print('Acc:', np.mean(v_acc_list))
 
     # plot the labels of all pairs in the last batch that assumed to have the same label
     # only matches are plotted since they are the rarer of the two classes. This peak inside the predictions
@@ -121,8 +129,11 @@ with tf.Session() as sess:
             print(y1[i],y2[i],'Same')
 
     # plot the loss curve.
-    plt.plot(list(range(len(loss_list))),loss_list)
- #   plt.show()
+    plt.plot(list(range(len(loss_list))),loss_list, label='Train Loss')
+    plt.plot(list(range(len(loss_list))),v_loss_list, label='Val Loss')
+    plt.show()
+    plt.plot(list(range(len(loss_list))),v_acc_list, label='Validation Accuracy')
+    plt.show()
 
     def get_mean_prediction(predictions, y):
         score_map = []

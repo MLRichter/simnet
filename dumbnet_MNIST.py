@@ -89,6 +89,8 @@ with tf.Session() as sess:
             # run training step
             _,l = sess.run([train_step,loss],feed_dict={X1:data,Y:labels})
             loss_list.append(l)
+
+
             # test model on validation data
             if i%100 == 0:
                 v_ll = []
@@ -118,8 +120,9 @@ with tf.Session() as sess:
 
     # print the mena accuracy over the test-set
     print('Val Acc: ',np.mean(v_acc))
+    print('Val Loss: ', np.mean(v_loss))
 
-        # test model on validation data
+    # test model on validation data
     loss_list = []
     acc_list = []
     l = 0.0
