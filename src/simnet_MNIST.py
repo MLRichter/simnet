@@ -1,8 +1,9 @@
-import tensorflow as tf
 import numpy as np
-from helper import MNIST
-from matplotlib import pyplot as plt
+import tensorflow as tf
 from layers import feed_forward_layer, conv_layer
+from matplotlib import pyplot as plt
+
+from src.helper import MNIST
 
 
 def get_siamnese(X):
