@@ -37,7 +37,14 @@ class SimpleGenerator():
     def get_batch(self, batch_size):
         for samples, labels in self._helper(batch_size):
             samples = samples.reshape((samples.shape[0], 28, 28, 1))
+            labels = self.get_one_hot(labels)
             yield samples, labels
+
+    def get_one_hot(self, labels):
+        oh_labels = np.zeros((len(labels), 10))
+        for i in range(len(labels)):
+            oh_labels[i][labels[i]] = 1
+        return oh_labels
 
     def steps(self, batch_size) -> int:
         return self._samples // batch_size

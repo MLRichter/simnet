@@ -1,5 +1,5 @@
 from simnet.helper import MNIST
-from models.dumbnet import Dumbnet
+from simnet.models.dumbnet import Dumbnet
 
 from simnet.generator import SimnetGenerator, SimpleGenerator
 from simnet.models.simnet import Simnet
@@ -39,5 +39,5 @@ class DumbnetEMNISTController:
     pass
 
 if __name__ == '__main__':
-    controller = SimnetMNISTController()
+    controller = DumbnetMNISTController()
     controller.run()
