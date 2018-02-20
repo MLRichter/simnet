@@ -1,8 +1,8 @@
-from src.model import AbstractModel
-from ..layers import *
+from simnet.model import AbstractModel
+from simnet.layers import *
 
 
-class Dumbnet(AbstractModel):
+class Simnet(AbstractModel):
     def __init__(self):
         super().__init__()
         self._init_network()
@@ -14,33 +14,36 @@ class Dumbnet(AbstractModel):
         return self._loss
 
     def _build_feed_dict(self, samples, labels):
-        return {self.X1: samples, self.Y: labels}
+        return {self.X1: samples[0], self.X2: samples[1], self.Y: labels}
 
     def _init_network(self):
         # Define the Network Graph
         with tf.variable_scope('Input'):
             self.X1 = tf.placeholder(tf.float32, shape=[None, 28, 28, 1], name='Img1')
-            self.Y = tf.placeholder(tf.float32, shape=[None, 10], name='Labels')
+            self.X2 = tf.placeholder(tf.float32, shape=[None, 28, 28, 1], name='Img2')
+            self.Y = tf.placeholder(tf.float32, shape=[None, 1], name='Labels')
 
         with tf.variable_scope('Siamese_Segment') as scope:
             left_net = self._get_siamnese(self.X1)
+            scope.reuse_variables()
+            right_net = self._get_siamnese(self.X2)
 
         with tf.variable_scope('Dense_Segment'):
-            concatenated = left_net
+            concatenated = tf.concat([left_net, right_net], axis=1, name='concatenated_out')
             d1 = feed_forward_layer(concatenated, 1024, activation_function=tf.nn.relu)
 
         # logits have their own scope to avoid variable dublication
         with tf.variable_scope('Logit'):
-            logits = feed_forward_layer(d1, 10)
+            logits = feed_forward_layer(d1, 1)
 
         with tf.variable_scope('Loss_Metrics_and_Training'):
             # use weighted loss, since images of two different classes statically outnumber the matches by 10:1
-            self._loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.Y, logits=logits))
+            self._loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.Y, logits, 0.1, 'Loss'))
 
             # calculate the accuracy
-            self._predicted_class = tf.argmax(logits, 1)
-            ground_truth = tf.argmax(self.Y, 1)
-            correct = tf.equal(self._predicted_class, ground_truth)
+            self._predicted_class = tf.greater(tf.nn.sigmoid(logits), 0.5)
+            sigmoidal_out = tf.nn.sigmoid(logits)
+            correct = tf.equal(self._predicted_class, tf.equal(self.Y, 1.0))
             self._accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
 
             # use GradientDecent to train, interestingly ADAM results in a collapsing model. Standard SGD performed reliably better

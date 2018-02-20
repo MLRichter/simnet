@@ -2,8 +2,9 @@ import numpy as np
 
 
 class SimnetGenerator():
-    def __init__(self, helper):
+    def __init__(self, helper, num_samples: int):
         self._helper = helper
+        self._samples = num_samples
 
     def get_batch(self, batch_size):
         half_batch = batch_size // 2
@@ -23,13 +24,20 @@ class SimnetGenerator():
 
             yield [x1, x2], y
 
+    def steps(self, batch_size) -> int:
+        return self._samples // batch_size
+
 
 class SimpleGenerator():
 
-    def __init__(self, helper):
+    def __init__(self, helper, num_samples: int):
         self._helper = helper
+        self._samples = num_samples
 
     def get_batch(self, batch_size):
         for samples, labels in self._helper(batch_size):
             samples = samples.reshape((samples.shape[0], 28, 28, 1))
             yield samples, labels
+
+    def steps(self, batch_size) -> int:
+        return self._samples // batch_size

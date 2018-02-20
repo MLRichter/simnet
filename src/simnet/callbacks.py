@@ -1,5 +1,7 @@
-from .model import Model
 
+import logging
+
+log = logging.getLogger(__name__)
 
 class Callback:
     def __init__(self):
@@ -29,7 +31,7 @@ class Callback:
     def validation_end(self, logs):
         pass
 
-    def set_model(self, model: Model):
+    def set_model(self, model):
         self.model = model
 
 
@@ -39,6 +41,12 @@ class Monitor(Callback):
         super().__init__()
         self.train_history = {}
         self.validation_history = {}
+
+    def epoch_start(self, logs):
+        print("Start epoch {}.".format(logs['epoch']))
+
+    def epoch_end(self, logs):
+        print("Finish epoch {}.".format(logs['epoch']))
 
     def batch_end(self, logs):
         if 'loss' in logs:
