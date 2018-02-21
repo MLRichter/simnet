@@ -2,7 +2,7 @@ import numpy as np
 import os, struct
 
 class MNIST():
-    def __init__(self, directory):
+    def __init__(self, directory="./data/"):
         self._directory = directory
         
         self._training_data = self._load_binaries("train-images.idx3-ubyte")
