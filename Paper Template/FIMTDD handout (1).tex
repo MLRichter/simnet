@@ -1,0 +1,57 @@
+\documentclass[a4paper,pt12]{article}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{placeins}
+
+\begin{document}
+\author{Pascal Stammer, Mats Richter, Benjamin Henne}
+\title{Final Project: A Comparison Of Siamese Oneshot Classification With Softmax Classification using Deep Neural Networks}
+
+
+\maketitle
+
+\begin{abstract}
+Learning from Dataset with sparse samples for individual classes and high inbalance in the distribution of classes is a big issue in deep learning and machine learning in general. Modern deep learning architectures usally require thousands of data points per class to learn generalizing concepts. Siamese Networks are an attempt to create a classifier that is very robust towards class inbalances and (in theory) able to distinguish classes by only seeing a single sample of one of the two classes (oneshot classification). This work evaluates the classification performance of a siamese neural network by comparing the classification performance against a very similar, softmax-classification convolutional neural network. We will compare the baseline performance differences between the network on a balanced dataset and further compare the performance on highly inbalanced data. 
+
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{Siamese Neural Networks}
+
+\section{Experiments}
+The experiments are aimed to look into the differences in learning behaviour between deep neural networks and siamese deep neural networks. We therefore used two simple and very similar showcase  architectures to make this comparison as clear as possible. We used the MNIST and the quantiatively larger EMNIST datasets as our data basis for our experiments. We altered the datasets class balance and the number of classes to compare the performance of both networks in increasingly difficult situations with regards to the structure of the dataset while keeping the data itself relatively simple.  
+
+\subsection{Network Architectures}
+Both networks are ment to be very similar to make their performance as comparable as possible.
+
+\subsubsection{Simnet}
+
+\subsubsection{Dumbnet}
+
+\subsection{Data and Experimental Setups}
+
+\subsubsection{MNIST Experiments}
+
+\subsubsection{EMNIST Experiments}
+
+\section{Results}
+
+\subsubsection{MNIST Experiments}
+
+\subsubsection{EMNIST Experiments}
+
+\section{Conclusion}
+
+
+% Dieser Stil erzeugt Verweise mit Autorenname und Jahr
+%\bibliographystyle{gerapali}
+%\bibliographystyle{wmaainf}
+\bibliographystyle{plain}
+\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+
+% Hier die Datei (ohne .bib) angeben, in der die referenzierten
+% Paper stehen
+\nocite{*}
+\bibliography{literatur}
+\end{document}
