@@ -63,3 +63,6 @@ class Dumbnet(AbstractModel):
 
         flat = tf.layers.flatten(conv3)
         return flat
+
+    def _get_metrics(self):
+        return {'accuracy': self._accuracy}

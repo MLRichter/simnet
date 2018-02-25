@@ -53,8 +53,14 @@ class Monitor(Callback):
             self._append_to_train_history('loss', logs['loss'])
 
     def validation_end(self, logs):
-        if 'loss' in logs:
-            self._append_to_train_history('loss', logs['loss'])
+        validation_step = logs['validation_step']
+        metrics = logs['metrics']
+
+        for key, value in metrics.items():
+            if key not in self.validation_history:
+                self.validation_history[key] = []
+
+            self.validation_history[key].extend([value] * validation_step)
 
     def _append_to_train_history(self, key, value):
         self._append(self.train_history, key, value)

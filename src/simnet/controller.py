@@ -17,7 +17,7 @@ class SimnetMNISTController:
         simnet = Simnet()
 
         # Do fitting
-        train_history, val_history = simnet.fit(train, val, 10, 32, 100)
+        train_history, val_history = simnet.fit(train, val, 30, 32, 100)
 
 class SimnetEMNISTController:
     pass
@@ -39,5 +39,5 @@ class DumbnetEMNISTController:
     pass
 
 if __name__ == '__main__':
-    controller = DumbnetMNISTController()
+    controller = SimnetMNISTController()
     controller.run()

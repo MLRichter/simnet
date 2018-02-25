@@ -49,11 +49,20 @@ class AbstractModel(Model):
             for callback in callbacks:
                 callback.batch_start({})
 
-            # run training step
-            _, _loss = sess.run([self._get_train_step(), self._get_loss()],
-                                feed_dict=self._build_feed_dict(data, labels))
+            targets = [self._get_train_step(), self._get_loss()]
+            targets.extend(self._get_metrics().values())
 
-            progbar.update(step + 1, [('loss', _loss)])
+            # run training step
+            _results = sess.run(targets, feed_dict=self._build_feed_dict(data, labels))
+
+            _loss = _results[1]
+
+            metric_values = {'loss': _loss}
+
+            for i, metric_name in enumerate(self._get_metrics().keys()):
+                metric_values[metric_name] = _results[i + 2]
+
+            progbar.update(step + 1, [(key, value) for key, value in metric_values.items()])
 
             if step % validation_step == 0:
                 self._do_evaluation(sess, val_generator, batch_size, validation_step, callbacks)
@@ -61,7 +70,7 @@ class AbstractModel(Model):
             step += 1
 
             for callback in callbacks:
-                callback.batch_end({'loss': _loss})
+                callback.batch_end(metric_values)
 
         for callback in callbacks:
             callback.epoch_end({'epoch': epoch})
@@ -75,6 +84,9 @@ class AbstractModel(Model):
     def _build_feed_dict(self, samples, labels):
         pass
 
+    def _get_metrics(self):
+        return {}
+
     def _init_session(self, session: tf.Session):
         session.run(tf.global_variables_initializer())
 
@@ -82,18 +94,28 @@ class AbstractModel(Model):
         for callback in callbacks:
             callback.validation_start({})
 
-        v_loss = []
-        v_acc = []
+        metrics = {}
 
         # test model on validation data
         for data, labels in val_generator.get_batch(batch_size):
-            _loss = session.run([self._get_loss()], feed_dict=self._build_feed_dict(data, labels))
 
-            # keep track of loss and accuracy
-            v_loss.append(_loss)
+            targets = [self._get_loss()]
+            targets.extend(self._get_metrics().values())
+
+            _results = session.run(targets, feed_dict=self._build_feed_dict(data, labels))
+
+            _loss = _results[0]
+
+            metric_values = {'loss': _loss}
+
+            for i, metric_name in enumerate(self._get_metrics().keys()):
+                metric_values[metric_name] = _results[i + 1]
+
+            for key, value in metric_values.items():
+                if key not in metrics:
+                    metrics[key] = []
+
+                metrics[key].append(value)
 
         for callback in callbacks:
-            callback.validation_end(logs={
-                'loss': v_loss * validation_step,
-                'accuracy': v_acc * validation_step
-            })
+            callback.validation_end(logs={'metrics': metrics, 'validation_step': validation_step})

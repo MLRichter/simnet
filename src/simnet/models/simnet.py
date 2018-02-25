@@ -49,6 +49,9 @@ class Simnet(AbstractModel):
             # use GradientDecent to train, interestingly ADAM results in a collapsing model. Standard SGD performed reliably better
             self._train_step = tf.train.GradientDescentOptimizer(0.01).minimize(self._loss)
 
+    def _get_metrics(self):
+        return {'accuracy': self._accuracy}
+
     def _get_siamnese(self, X):
         """
         creates the siamnese stem for the neural network. This is the part both images are send through sequentially
