@@ -3,8 +3,9 @@ from simnet.layers import *
 
 
 class Dumbnet(AbstractModel):
-    def __init__(self):
+    def __init__(self, num_classes=10):
         super().__init__()
+        self._num_classes = num_classes
         self._init_network()
 
     def _get_train_step(self):
@@ -20,7 +21,7 @@ class Dumbnet(AbstractModel):
         # Define the Network Graph
         with tf.variable_scope('Input'):
             self.X1 = tf.placeholder(tf.float32, shape=[None, 28, 28, 1], name='Img1')
-            self.Y = tf.placeholder(tf.float32, shape=[None, 10], name='Labels')
+            self.Y = tf.placeholder(tf.float32, shape=[None, self._num_classes], name='Labels')
 
         with tf.variable_scope('Siamese_Segment') as scope:
             left_net = self._get_siamnese(self.X1)
@@ -31,7 +32,7 @@ class Dumbnet(AbstractModel):
 
         # logits have their own scope to avoid variable dublication
         with tf.variable_scope('Logit'):
-            logits = feed_forward_layer(d1, 10)
+            logits = feed_forward_layer(d1, self._num_classes)
 
         with tf.variable_scope('Loss_Metrics_and_Training'):
             # use weighted loss, since images of two different classes statically outnumber the matches by 10:1
@@ -42,6 +43,11 @@ class Dumbnet(AbstractModel):
             ground_truth = tf.argmax(self.Y, 1)
             correct = tf.equal(self._predicted_class, ground_truth)
             self._accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
+
+            true_positive = tf.reduce_sum(tf.cast(tf.equal(tf.equal(self._predicted_class, 1), tf.equal(ground_truth, 1)), 'float'))
+            false_positive = tf.reduce_sum(tf.cast(tf.not_equal(tf.equal(self._predicted_class, 1), tf.equal(ground_truth, 1)), 'float'))
+
+            self._precision = true_positive / (true_positive + false_positive + 1e-6)
 
             # use GradientDecent to train, interestingly ADAM results in a collapsing model. Standard SGD performed reliably better
             self._train_step = tf.train.GradientDescentOptimizer(0.01).minimize(self._loss)
@@ -65,4 +71,4 @@ class Dumbnet(AbstractModel):
         return flat
 
     def _get_metrics(self):
-        return {'accuracy': self._accuracy}
+        return {'accuracy': self._accuracy, 'precision': self._precision}

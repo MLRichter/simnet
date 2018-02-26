@@ -30,7 +30,8 @@ class SimnetGenerator():
 
 class SimpleGenerator():
 
-    def __init__(self, helper, num_samples: int):
+    def __init__(self, helper, num_samples: int, num_classes=10):
+        self._num_classes = num_classes
         self._helper = helper
         self._samples = num_samples
 
@@ -41,7 +42,7 @@ class SimpleGenerator():
             yield samples, labels
 
     def get_one_hot(self, labels):
-        oh_labels = np.zeros((len(labels), 10))
+        oh_labels = np.zeros((len(labels), self._num_classes))
         for i in range(len(labels)):
             oh_labels[i][labels[i]] = 1
         return oh_labels

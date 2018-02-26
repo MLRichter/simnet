@@ -44,13 +44,19 @@ class Simnet(AbstractModel):
             self._predicted_class = tf.greater(tf.nn.sigmoid(logits), 0.5)
             sigmoidal_out = tf.nn.sigmoid(logits)
             correct = tf.equal(self._predicted_class, tf.equal(self.Y, 1.0))
+
+            true_positive = tf.reduce_sum(tf.cast(tf.equal(self._predicted_class, tf.equal(self.Y, 1.0)), 'float'))
+            false_positive = tf.reduce_sum(tf.cast(tf.not_equal(self._predicted_class, tf.equal(self.Y, 1.0)), 'float'))
+
             self._accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
+
+            self._precision = true_positive / (true_positive + false_positive + 1e-6)
 
             # use GradientDecent to train, interestingly ADAM results in a collapsing model. Standard SGD performed reliably better
             self._train_step = tf.train.GradientDescentOptimizer(0.01).minimize(self._loss)
 
     def _get_metrics(self):
-        return {'accuracy': self._accuracy}
+        return {'accuracy': self._accuracy, 'precision': self._precision}
 
     def _get_siamnese(self, X):
         """
