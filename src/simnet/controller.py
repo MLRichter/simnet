@@ -21,9 +21,9 @@ class SimnetMNISTController:
             simnet = Simnet()
 
             # Do fitting
-            train_history, val_history = simnet.fit(sess, train, val, 30, 32, 100)
+            train_history, val_history = simnet.fit(sess, train, val, 100, 256, 100)
 
-            acc, avg_acc = simnet.evaluate_special(sess, data.get_test_batch, 128, data.get_classification_samples, data.get_sizes()[2])
+            acc, avg_acc = simnet.evaluate_special(sess, data.get_test_batch, 256, data.get_classification_samples, data.get_sizes()[2])
 
             print("Test ACC: ", acc, " TEST AVG ACC: ", avg_acc)
 
@@ -41,9 +41,9 @@ class SimnetEMNISTController:
             simnet = Simnet()
 
             # Do fitting
-            train_history, val_history = simnet.fit(sess, train, val, 30, 32, 100)
+            train_history, val_history = simnet.fit(sess, train, val, 100, 256, 100)
 
-            acc, avg_acc = simnet.evaluate_special(sess, data.get_test_batch, 128, data.get_classification_samples, data.get_sizes()[2])
+            acc, avg_acc = simnet.evaluate_special(sess, data.get_test_batch, 256, data.get_classification_samples, data.get_sizes()[2])
 
             print("Test ACC: ", acc, " TEST AVG ACC: ", avg_acc)
 
@@ -60,9 +60,9 @@ class DumbnetMNISTController:
             dumbnet = Dumbnet()
 
             # Do fitting
-            train_history, val_history = dumbnet.fit(sess, train, val, 10, 32, 100)
+            train_history, val_history = dumbnet.fit(sess, train, val, 10, 256, 100)
 
-            test_history = dumbnet.evaluate(sess, test, 128)
+            test_history = dumbnet.evaluate(sess, test, 256)
 
             print("TEST ACC: ", np.mean(test_history['accuracy'][0]))
 
@@ -79,9 +79,9 @@ class DumbnetEMNISTController:
             dumbnet = Dumbnet(num_classes=62)
 
             # Do fitting
-            train_history, val_history = dumbnet.fit(sess, train, val, 10, 32, 100)
+            train_history, val_history = dumbnet.fit(sess, train, val, 10, 256, 100)
 
-            test_history = dumbnet.evaluate(sess, test, 128)
+            test_history = dumbnet.evaluate(sess, test, 256)
 
             print("TEST ACC: ", np.mean(test_history['accuracy'][0]))
 
