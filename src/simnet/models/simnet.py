@@ -1,6 +1,6 @@
 from simnet.model import AbstractModel
 from simnet.layers import *
-
+import numpy as np
 
 class Simnet(AbstractModel):
     def __init__(self):
@@ -42,7 +42,7 @@ class Simnet(AbstractModel):
 
             # calculate the accuracy
             self._predicted_class = tf.greater(tf.nn.sigmoid(logits), 0.5)
-            sigmoidal_out = tf.nn.sigmoid(logits)
+            self.sigmoidal_out = tf.nn.sigmoid(logits)
             correct = tf.equal(self._predicted_class, tf.equal(self.Y, 1.0))
 
             true_positive = tf.reduce_sum(tf.cast(tf.equal(self._predicted_class, tf.equal(self.Y, 1.0)), 'float'))
@@ -55,8 +55,47 @@ class Simnet(AbstractModel):
             # use GradientDecent to train, interestingly ADAM results in a collapsing model. Standard SGD performed reliably better
             self._train_step = tf.train.GradientDescentOptimizer(0.01).minimize(self._loss)
 
+    def evaluate_special(self, session: tf.Session, val_generator, batch_size: int, classification_samples, size):
+        test_acc = []
+        samples_per_shot = 100
+        total_data_processed = 0.0
+        correct = 0.0
+        correct_avg = 0.0
+        for data, labels in val_generator(batch_size):
+            data = data.reshape((data.shape[0], 28, 28, 1))
+            print('[INFO] processing', total_data_processed, 'of', size)
+
+            # calssify a single sample
+            for i in range(len(data)):
+                x1, y1 = classification_samples(samples_per_shot // 10)
+                x2 = np.asarray([list(data[i])] * samples_per_shot)
+
+                pc = session.run([self.sigmoidal_out], feed_dict={self.X1: x1, self.X2: x2})
+                prediction = y1[np.argmin(pc)]
+                prediction_avg = self._get_mean_prediction(np.squeeze(pc), y1)
+
+                if prediction == labels[i]:
+                    correct += 1.0
+                if prediction_avg == labels[i]:
+                    correct_avg += 1.0
+                total_data_processed += 1.0
+                # keep track of loss and accuracy
+        accuracy = correct / total_data_processed
+        avg_acc = correct_avg / total_data_processed
+
+        return accuracy, avg_acc
+
     def _get_metrics(self):
         return {'accuracy': self._accuracy, 'precision': self._precision}
+
+
+    def _get_mean_prediction(self, predictions, y):
+        score_map = []
+        for i in range(10):
+            c_pred = predictions[y == i]
+            m = np.mean(c_pred)
+            score_map.append(m)
+        return np.argmin(score_map)
 
     def _get_siamnese(self, X):
         """

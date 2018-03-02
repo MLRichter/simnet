@@ -12,30 +12,42 @@ log = logging.getLogger(__name__)
 
 class Model(ABC):
     @abstractmethod
-    def fit(self, train_generator, val_generator, epochs: int, batch_size: int, validation_step: int, callbacks=[]):
+    def fit(self, session: tf.Session, train_generator, val_generator, epochs: int, batch_size: int, validation_step: int, callbacks=[]):
+        pass
+
+    @abstractmethod
+    def evaluate(self, session: tf.Session, val_generator, batch_size):
         pass
 
 
 class AbstractModel(Model):
-    def fit(self, train_generator, val_generator, epochs: int, batch_size: int, validation_step: int, callbacks=[]):
+    def fit(self, session: tf.Session, train_generator, val_generator, epochs: int, batch_size: int, validation_step: int, callbacks=[]):
         monitor = Monitor()
         callbacks.append(monitor)
 
-        self._do_fit(train_generator, val_generator, epochs, batch_size, validation_step, callbacks)
+        self._do_fit(session, train_generator, val_generator, epochs, batch_size, validation_step, callbacks)
 
         return monitor.train_history, monitor.validation_history
 
-    def _do_fit(self, train_generator, val_generator, epochs: int, validation_step: int, batch_size: int, callbacks):
-        with tf.Session() as sess:
-            self._init_session(sess)
-            for callback in callbacks:
-                callback.train_start({})
+    def evaluate(self, session: tf.Session, val_generator, batch_size: int):
+        monitor = Monitor()
+        callbacks = []
+        callbacks.append(monitor)
 
-            for epoch in range(epochs):
-                self._do_epoch(sess, epoch, train_generator, val_generator, validation_step, batch_size, callbacks)
+        self._do_evaluation(session, val_generator, batch_size, 1, callbacks)
 
-            for callback in callbacks:
-                callback.train_end({})
+        return monitor.validation_history
+
+    def _do_fit(self, sess: tf.Session, train_generator, val_generator, epochs: int, validation_step: int, batch_size: int, callbacks):
+        self._init_session(sess)
+        for callback in callbacks:
+            callback.train_start({})
+
+        for epoch in range(epochs):
+            self._do_epoch(sess, epoch, train_generator, val_generator, validation_step, batch_size, callbacks)
+
+        for callback in callbacks:
+            callback.train_end({})
 
     def _do_epoch(self, sess: tf.Session, epoch: int, train_generator, val_generator, validation_step: int,
                   batch_size: int, callbacks):
