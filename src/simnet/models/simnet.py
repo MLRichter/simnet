@@ -1,5 +1,7 @@
-from simnet.model import AbstractModel
-from simnet.layers import *
+from src.simnet.model import AbstractModel
+from src.simnet.layers import *
+from src.simnet.util import get_class_weights
+from sklearn.metrics.classification import accuracy_score
 import numpy as np
 
 class Simnet(AbstractModel):
@@ -55,20 +57,30 @@ class Simnet(AbstractModel):
             # use GradientDecent to train, interestingly ADAM results in a collapsing model. Standard SGD performed reliably better
             self._train_step = tf.train.GradientDescentOptimizer(0.01).minimize(self._loss)
 
-    def evaluate_special(self, session: tf.Session, val_generator, batch_size: int, classification_samples, size):
+    def evaluate_special(self, session: tf.Session, val_generator, batch_size: int, classification_samples, size, emnist=True):
         test_acc = []
         samples_per_shot = 100
         total_data_processed = 0.0
         correct = 0.0
         correct_avg = 0.0
+
+        # stuff for the weighted accuracy
+        predictions = []
+        sample_weights = []
+        ground_truth = []
+        class_weights = get_class_weights()
+
         for data, labels in val_generator(batch_size):
             data = data.reshape((data.shape[0], 28, 28, 1))
             print('[INFO] processing', total_data_processed, 'of', size)
 
             # calssify a single sample
             for i in range(len(data)):
-                x1, y1 = classification_samples(samples_per_shot // 10)
-                x2 = np.asarray([list(data[i])] * samples_per_shot)
+                if emnist:
+                    x1, y1 = classification_samples(samples_per_shot // 62)
+                else:
+                    x1, y1 = classification_samples(samples_per_shot // 10)
+                x2 = np.asarray([list(data[i])] * len(y1))
 
                 pc = session.run([self.sigmoidal_out], feed_dict={self.X1: x1, self.X2: x2})
                 prediction = y1[np.argmin(pc)]
@@ -78,12 +90,19 @@ class Simnet(AbstractModel):
                     correct += 1.0
                 if prediction_avg == labels[i]:
                     correct_avg += 1.0
+                predictions.append(prediction_avg)
+                sample_weights.append(class_weights)
+                ground_truth.append(labels[i])
+
                 total_data_processed += 1.0
                 # keep track of loss and accuracy
         accuracy = correct / total_data_processed
         avg_acc = correct_avg / total_data_processed
-
-        return accuracy, avg_acc
+        try:
+            weighted_acc = accuracy_score(ground_truth,predictions,True,sample_weights)
+        except:
+            weighted_acc = None
+        return accuracy, avg_acc, weighted_acc
 
     def _get_metrics(self):
         return {'accuracy': self._accuracy, 'precision': self._precision}
