@@ -7,7 +7,6 @@
 \author{Pascal Stammer, Mats Richter, Benjamin Henne}
 \title{Final Project: A Comparison Of Siamese Oneshot Classification With Softmax Classification using Deep Neural Networks}
 
-
 \maketitle
 
 \begin{abstract}
@@ -15,7 +14,32 @@ Learning from Dataset with sparse samples for individual classes and high inbala
 
 \end{abstract}
 
-\section{Introduction}
+\section{Task description}
+In most machine learning approaches a large amount of data is key to achieve good or human-level performance in classification task.
+But while large data collections exists for some well-defined problems, in many real world applications the data provided for
+each class is often very small and more or less unbalanced. Furthermore any additional class leads to very expensive retraining of the entire model.
+
+To address this issue of missing training data, unbalanced data and the possibility to retrain the entire model,
+a procedure called one-shot classification (Fe-Fei et. al. 2003) can be used. This must be distinguished from zero-shot
+classification in which the model have no access to any sample of the target classes (Palatucci et al., 2009).
+
+In this work we use a deep neural network proposed in Koch et. al, 2015 called siamese neural network. In order to validate the siamese neural networks
+single shot-classifications performance and the ability to solve the problems of unbalanced data sets we compare the classification
+performance between a simple convolutional neural network and a siamese neural network with the same convolutional network structure on
+the EMNIST.
+
+The EMNIST data set consists of around 700.000 samples of handwritten digits and letters of 62-classes and is fairly unbalanced.
+This gives us a good base to evaluate the classification performance on a unbalanced data set and compare this performance to classical approaches
+used in the deep learning community.
+
+\section{Related work and similar approaches}
+According to Koch et. al., 2015, one-shot classification research is fairly immature and not much discussed in the deep learning
+community. The first work goes back to the early 2000's done by Li Fei-Fei et al. They were developing a variational Bayesian framework for one-shot
+classification that have good generalization properties with very few examples on unseen classes if the network is trained on other classes before (Fe-Fei et al., 2003; Fei-Fei et al., 2006).
+
+
+
+\section{Theoretical basis and used procedures}
 
 \subsection{Siamese Neural Networks}
 
