@@ -12,7 +12,11 @@ classification in which the model have no access to any sample of the target cla
 In this work we use a deep neural network proposed in Koch et. al, 2015 called siamese neural network. In order to validate the siamese neural networks
 single shot-classifications performance and the ability to solve the problems of unbalanced data sets we compare the classification
 performance between a simple convolutional neural network and a siamese neural network with the same convolutional network structure on
-the EMNIST unbalanced 62-classes data set.
+the EMNIST.
+
+The EMNIST data set consists of around 700.000 samples of handwritten digits and letters of 62-classes and is fairly unbalanced.
+This gives us a good base to evaluate the classification performance on a unbalanced data set and compare this performance to classical approaches
+used in the deep learning community.
 
 
 References:
