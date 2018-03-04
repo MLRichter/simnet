@@ -1,5 +1,5 @@
-from simnet.model import AbstractModel
-from simnet.layers import *
+from src.simnet.model import AbstractModel
+from src.simnet.layers import *
 
 
 class Dumbnet(AbstractModel):

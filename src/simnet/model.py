@@ -3,8 +3,10 @@ from abc import ABC, abstractmethod
 
 import tensorflow as tf
 
-from simnet.callbacks import Monitor
-from simnet.util import Progbar
+from src.simnet.callbacks import Monitor
+from src.simnet.util import Progbar
+from src.simnet.util import get_class_weights
+from sklearn.metrics.classification import accuracy_score
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
@@ -56,6 +58,8 @@ class AbstractModel(Model):
 
         step = 0
 
+        sample_weight_dict = get_class_weights()
+
         progbar = Progbar(train_generator.steps(batch_size))
         for data, labels in train_generator.get_batch(batch_size):
             for callback in callbacks:
@@ -66,6 +70,10 @@ class AbstractModel(Model):
 
             # run training step
             _results = sess.run(targets, feed_dict=self._build_feed_dict(data, labels))
+
+            class_weights = get_class_weights()
+
+
 
             _loss = _results[1]
 
