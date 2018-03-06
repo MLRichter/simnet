@@ -36,6 +36,9 @@ class Callback:
 
 
 class Monitor(Callback):
+    """
+    Monitor callback which collects different metric values and is divided by train and validation eval values.
+    """
 
     def __init__(self):
         super().__init__()

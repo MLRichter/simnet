@@ -6,6 +6,9 @@ from src.simnet.models.simnet import Simnet
 import tensorflow as tf
 import numpy as np
 
+"""
+Control the experiments
+"""
 
 class SimnetMNISTController:
 
@@ -14,7 +17,6 @@ class SimnetMNISTController:
         data = MNIST('../../data/mnist/')
         train = SimnetGenerator(data.get_training_batch, data.get_sizes()[0])
         val = SimnetGenerator(data.get_validation_batch, data.get_sizes()[1])
-        test = SimnetGenerator(data.get_test_batch, data.get_sizes()[2])
 
         with tf.Session() as sess:
             # Define models
@@ -33,7 +35,6 @@ class SimnetEMNISTController:
         data = EMNIST('../../data/emnist/')
         train = SimnetGenerator(data.get_training_batch, data.get_sizes()[0])
         val = SimnetGenerator(data.get_validation_batch, data.get_sizes()[1])
-        test = SimnetGenerator(data.get_test_batch, data.get_sizes()[2])
 
         with tf.Session() as sess:
 

@@ -73,8 +73,6 @@ class AbstractModel(Model):
 
             class_weights = get_class_weights()
 
-
-
             _loss = _results[1]
 
             metric_values = {'loss': _loss}

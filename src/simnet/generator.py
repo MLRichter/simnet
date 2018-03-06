@@ -1,5 +1,10 @@
 import numpy as np
 
+"""
+General implementation of the generator patters that basically represent a iterable. This pattern is heavily used
+in keras. Because this pattern is very simple and provide very high flexibility and make the code much more readable
+we decide to use it here.
+"""
 
 class SimnetGenerator():
     def __init__(self, helper, num_samples: int):
@@ -7,6 +12,11 @@ class SimnetGenerator():
         self._samples = num_samples
 
     def get_batch(self, batch_size):
+        """
+        Iterable of triple of sample data and corresponding labels of batch_size
+        :param batch_size: the number of samples per batch
+        :return: triple of batch of data for one simnet part, batch of data for other simnet part and batch of corresponding labels
+        """
         half_batch = batch_size // 2
         for samples, labels in self._helper(batch_size):
             samples = samples.reshape((samples.shape[0], 28, 28, 1))
@@ -36,6 +46,11 @@ class SimpleGenerator():
         self._samples = num_samples
 
     def get_batch(self, batch_size):
+        """
+        Iterable of tuples of sample data and corresponding labels of batch_size
+        :param batch_size: the number of samples per batch
+        :return: tuple of batch of data and batch of corresponding labels
+        """
         for samples, labels in self._helper(batch_size):
             samples = samples.reshape((samples.shape[0], 28, 28, 1))
             labels = self.get_one_hot(labels)
