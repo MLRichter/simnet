@@ -3,6 +3,7 @@ from src.simnet.layers import *
 from src.simnet.util import get_class_weights
 from sklearn.metrics.classification import accuracy_score
 import numpy as np
+import time
 
 class Simnet(AbstractModel):
     def __init__(self):
@@ -56,6 +57,11 @@ class Simnet(AbstractModel):
 
             # use GradientDecent to train, interestingly ADAM results in a collapsing model. Standard SGD performed reliably better
             self._train_step = tf.train.GradientDescentOptimizer(0.01).minimize(self._loss)
+
+        with tf.variable_scope("summaries"):
+            tf.summary.scalar('loss', self._loss)
+            tf.summary.scalar('acc', self._accuracy)
+            self._merged = tf.summary.merge_all()
 
     def evaluate_special(self, session: tf.Session, val_generator, batch_size: int, classification_samples, size, emnist=True):
         test_acc = []
@@ -133,3 +139,8 @@ class Simnet(AbstractModel):
 
         flat = tf.layers.flatten(conv3)
         return flat
+
+    def _get_summary(self):
+        return self._merged
+
+

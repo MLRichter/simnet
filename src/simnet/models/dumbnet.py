@@ -52,6 +52,11 @@ class Dumbnet(AbstractModel):
             # use GradientDecent to train, interestingly ADAM results in a collapsing model. Standard SGD performed reliably better
             self._train_step = tf.train.GradientDescentOptimizer(0.01).minimize(self._loss)
 
+            with tf.variable_scope("summaries"):
+                tf.summary.scalar('loss', self._loss)
+                tf.summary.scalar('acc', self._accuracy)
+                self._merged = tf.summary.merge_all()
+
     def _get_siamnese(self, X):
         """
         creates the siamnese stem for the neural network. This is the part both images are send through sequentially
@@ -72,3 +77,8 @@ class Dumbnet(AbstractModel):
 
     def _get_metrics(self):
         return {'accuracy': self._accuracy, 'precision': self._precision}
+
+    def _get_summary(self):
+        return self._merged
+
+
