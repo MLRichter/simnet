@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/W32TeX) (preloaded format=pdflatex 2017.2.22)  3 MAR 2018 19:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/W32TeX) (preloaded format=pdflatex 2017.2.22)  6 MAR 2018 15:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -145,53 +145,73 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 11.
+(Font)              <12> on input line 10.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 11.
+(Font)              <8> on input line 10.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 11.
+(Font)              <6> on input line 10.
+Missing character: There is no Â in font cmr10!
+Missing character: There is no ’ in font cmr10!
  [1
 
-{c:/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-<nets.png, id=12, 963.6pt x 722.7pt>
+{c:/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 44.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 44.
+ [3]
+<nets.png, id=19, 963.6pt x 722.7pt>
 File: nets.png Graphic file (type png)
  <use nets.png>
-Package pdftex.def Info: nets.png used on input line 28.
+Package pdftex.def Info: nets.png used on input line 56.
 (pdftex.def)             Requested size: 289.08223pt x 216.81166pt.
 
 
-LaTeX Warning: Citation `siamese' on page 2 undefined on input line 36.
+LaTeX Warning: Citation `siamese' on page 4 undefined on input line 64.
 
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 37.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 37.
-[2 <./nets.png (PNG copy)>]
+[4 <./nets.png (PNG copy)>] <mnist.png, id=24, 253.44687pt x 109.40875pt>
+File: mnist.png Graphic file (type png)
+
+<use mnist.png>
+Package pdftex.def Info: mnist.png used on input line 72.
+(pdftex.def)             Requested size: 202.75777pt x 87.5271pt.
+ <emnist.png, id=26, 521.44812pt x 107.90312pt>
+File: emnist.png Graphic file (type png)
+
+<use emnist.png>
+Package pdftex.def Info: emnist.png used on input line 80.
+(pdftex.def)             Requested size: 312.87129pt x 64.74236pt.
+ [5 <./mnist.png> <./emnist.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 111--113
+
+ []
+
 No file "FIMTDD handout (1)".bbl.
-[3] (./FIMTDD handout (1).aux)
+[6] (./FIMTDD handout (1).aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 1593 strings out of 493013
- 22569 string characters out of 6136993
- 82915 words of memory out of 5000000
- 5134 multiletter control sequences out of 15000+600000
+ 1603 strings out of 493013
+ 22702 string characters out of 6136993
+ 83915 words of memory out of 5000000
+ 5142 multiletter control sequences out of 15000+600000
  8502 words of font info for 30 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 39i,6n,25p,911b,189s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 39i,6n,25p,961b,189s stack positions out of 5000i,500n,10000p,200000b,80000s
 <c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/tex
 live/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2016
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><c:/texlive/2016/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2016/texmf-dist/fonts/ty
-pe1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmr17.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmr9.pfb>
-Output written on "FIMTDD handout (1).pdf" (3 pages, 135763 bytes).
+t/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2016/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmr12.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmr17.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.p
+fb>
+Output written on "FIMTDD handout (1).pdf" (6 pages, 280993 bytes).
 PDF statistics:
- 43 PDF objects out of 1000 (max. 8388607)
- 29 compressed objects within 1 object stream
+ 61 PDF objects out of 1000 (max. 8388607)
+ 39 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

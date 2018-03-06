@@ -68,19 +68,53 @@ A normal Gradient Decent optimizer was used, since Adam lead to instabilities in
 \subsection{Data and Experimental Setups}
 
 \subsubsection{MNIST Experiments}
+
+\includegraphics[scale=0.8]{mnist.png}
+
 The MNIST dataset is one of the quasi standard datasets in machine learning and deep learning. It is a balanced dataset consisting of binary, square images with a size of 28 pixels on each side. There are ten classes resembling handwritten digits from zero to nine. The dataset is balanced and known to be very solveable for simple computer vision algorithms with little noise and no missclassifications in the ground truth. \newline
-The MNIST performance serves as baseline of performance on a sovable, balanced classification problem. 
+The MNIST performance serves as baseline of performance on a sovable, balanced classification problem. \newline
+The experiments were conducted with the default parameters and 10 Epochs of training on both algorithms. Simnet received on test time 10 samples per class and averaged over the samples to generate the final classification. The batch size for both networks was fixed to 256 datappoints per mini batch.
 
 \subsubsection{EMNIST Experiments}
-EMNIST is a novel extension for the MNIST dataset. We used the by-class version of the dataset with 62 classes, containing additional classes for handwritten letters (lower and capital are treated as seperate classes). The most important property of this dataset is the relatively close resemblance to MNIST by simultaniousny beeing a more complex classification problem with strong inbalances between the classes.
+
+\includegraphics[scale=0.6]{emnist.png}
+
+EMNIST is a novel extension for the MNIST dataset. We used the by-class version of the dataset with 62 classes, containing additional classes for handwritten letters (lower and capital are treated as seperate classes). The most important property of this dataset is the relatively close resemblance to MNIST by simultaniousny beeing a more complex classification problem with strong inbalances between the classes. \newline
+The experimental setups is identical to MNIST with the exception of the number of epochs for Simnet, which was increased to 100, since Simnet took longer to converge.
 
 \section{Results}
+In this chapter we will present the results of the experiments. First we will discuss the MNIST results and deduct the performance diferences on balanced datasets. We will then move on to the EMNIST experiments and compare the results to MNIST-experiments and how strong inbalances impact the learning behaviour of both algorithms.
 
 \subsubsection{MNIST Experiments}
+\begin{center}
+    \begin{tabular}{| l | l | l | }
+    \hline
+    Network & Accuracy & Weighted Accuracy \\ \hline
+    Dumbnet & 96.98\% & not needed (balanced) \\ \hline
+	Simnet & 95.78\% & not needed (balanced) \\ \hline
+    \end{tabular}
+\end{center}
+
+On MNIST both Networks showed very similar performance, but with a slight edge in favour of Dumbnet. The reason for this is likely the probabilistic inference of simnet. Also Simnet needed a lot more training epochs to converge to a comparable solution. However, this was exspected since the dataspace of two digit pairs is a lot larger than the dataspace of single MNIST-Digits. 
 
 \subsubsection{EMNIST Experiments}
+\begin{center}
+    \begin{tabular}{| l | l | l | }
+    \hline
+    Network & Accuracy & Weighted Accuracy \\ \hline
+    Dumbnet & 82.51\% & 68.
+    06\% \\ \hline
+	Simnet & 69.42\% & 41.78\% \\ \hline
+    \end{tabular}
+\end{center}
 
-\section{Conclusion}
+Suprisingly, the performance on EMNIST decreased drastically for Simnet, meanwhile Dumbnets performance also decreased severly, but not nearly as much as Simnets. \newline
+Finding reasons for this decrease is highly speculative and would require more hetergenious test, which are out of scope for this project, to properly verify. The performance on training  time for Simnet is still good with 96\% accuracy on training samples The likeliest cause for the performance decrease is the increase in classes compared to MNIST. Discriminative features learned by Simnet that optimize the recognition of differences between two labels don't generalize on all labels, creating a distance measure that does not distinguish very well between all labels in a way, that would allow good multi-class classification. \newline
+
+\section{Conclusion and Outlook}
+In our final project we implemented a siamese and a convolutional neural network with very similar architectures to compare the performance of both on multi-class classification problems on balanced (MNIST) and inabalanced (EMNIST) datasets. \newline
+We showed that the siamese network has very similar multi-class acurracy on MNIST, but this does not translate over to EMNIST, where the siamese network generally failed to give good multi class classification result even though it had a high binary classification accuracy. \newline
+For future works it would be interesting to verify this result on different datasets and a more general set of architectures, which was not possible in this work due to time and ressource constraints. A deeper look into the interaction of inbalance of data and classification performance would be also interesting to look at, in order to further verify or neglegt the hypothesised advantage of one-shot classification, when dealing with extreme inbalances or single samples in a dataset.
 
 
 % Dieser Stil erzeugt Verweise mit Autorenname und Jahr
