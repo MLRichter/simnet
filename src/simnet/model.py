@@ -7,6 +7,8 @@ from src.simnet.callbacks import Monitor
 from src.simnet.util import Progbar
 from src.simnet.util import get_class_weights
 from sklearn.metrics.classification import accuracy_score
+from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
@@ -132,6 +134,8 @@ class AbstractModel(Model):
 
         metrics = {}
 
+        t_y = None
+        t_preds = None
         # test model on validation data
         for data, labels in val_generator.get_batch(batch_size):
 
@@ -141,6 +145,17 @@ class AbstractModel(Model):
                 targets.append(self._get_summary())
 
             _results = session.run(targets, feed_dict=self._build_feed_dict(data, labels))
+            preds = session.run(self._predicted_class, feed_dict=self._build_feed_dict(data, labels))
+
+            if type(t_y) == type(None):
+                t_y = np.argmax(labels,axis=1)
+                t_preds = preds
+            else:
+                t_y = np.hstack((t_y,np.argmax(labels,axis=1)))
+                t_preds = np.hstack((t_preds,preds))
+
+
+
 
             if self._get_summary() is not None:
                 self.val_writer.add_summary(_results[-1], self._global_step)
@@ -157,6 +172,16 @@ class AbstractModel(Model):
                     metrics[key] = []
 
                 metrics[key].append(value)
+
+        class_weight = compute_class_weight('balanced', np.unique(t_y), t_y)
+        sample_weights = np.zeros(t_y.shape[0])
+        for i, weight in enumerate(class_weight):
+            sample_weights[t_y == i] = weight
+        try:
+            weighted_acc = accuracy_score(t_y, t_preds, True, sample_weights)
+        except:
+            weighted_acc = None
+        metrics['weighted_acc'] = weighted_acc
 
         progbar.update(step + 1, [('val_' + key, np.mean(value)) for key, value in metrics.items()])
 

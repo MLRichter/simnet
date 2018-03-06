@@ -2,6 +2,7 @@ from src.simnet.model import AbstractModel
 from src.simnet.layers import *
 from src.simnet.util import get_class_weights
 from sklearn.metrics.classification import accuracy_score
+from sklearn.utils import compute_class_weight
 import numpy as np
 import time
 
@@ -41,7 +42,9 @@ class Simnet(AbstractModel):
 
         with tf.variable_scope('Loss_Metrics_and_Training'):
             # use weighted loss, since images of two different classes statically outnumber the matches by 10:1
-            self._loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.Y, logits, 0.1, 'Loss'))
+            #self._loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.Y, logits, 0.1, 'Loss'))
+            # use weighted loss for emnist
+            self._loss = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(self.Y, logits, 0.016, 'Loss'))
 
             # calculate the accuracy
             self._predicted_class = tf.greater(tf.nn.sigmoid(logits), 0.5)
@@ -63,9 +66,9 @@ class Simnet(AbstractModel):
             tf.summary.scalar('acc', self._accuracy)
             self._merged = tf.summary.merge_all()
 
-    def evaluate_special(self, session: tf.Session, val_generator, batch_size: int, classification_samples, size, emnist=True):
+    def evaluate_special(self, session: tf.Session, val_generator, batch_size: int, classification_samples, size, emnist=True, class_weights =None):
         test_acc = []
-        samples_per_shot = 100
+        samples_per_shot = 6200
         total_data_processed = 0.0
         correct = 0.0
         correct_avg = 0.0
@@ -74,7 +77,7 @@ class Simnet(AbstractModel):
         predictions = []
         sample_weights = []
         ground_truth = []
-        class_weights = get_class_weights()
+
 
         for data, labels in val_generator(batch_size):
             data = data.reshape((data.shape[0], 28, 28, 1))
@@ -90,33 +93,37 @@ class Simnet(AbstractModel):
 
                 pc = session.run([self.sigmoidal_out], feed_dict={self.X1: x1, self.X2: x2})
                 prediction = y1[np.argmin(pc)]
-                prediction_avg = self._get_mean_prediction(np.squeeze(pc), y1)
+                prediction_avg = self._get_mean_prediction(np.squeeze(pc), y1,emnist=emnist)
 
                 if prediction == labels[i]:
                     correct += 1.0
                 if prediction_avg == labels[i]:
                     correct_avg += 1.0
-                predictions.append(prediction_avg)
-                sample_weights.append(class_weights)
+                predictions.append(prediction)
+                sample_weights.append(class_weights[labels[i]])
                 ground_truth.append(labels[i])
 
                 total_data_processed += 1.0
                 # keep track of loss and accuracy
+            try:
+                weighted_acc = accuracy_score(ground_truth,predictions,True,sample_weights)
+            except:
+                weighted_acc = None
+            print('weighted_acc:',weighted_acc)
         accuracy = correct / total_data_processed
         avg_acc = correct_avg / total_data_processed
-        try:
-            weighted_acc = accuracy_score(ground_truth,predictions,True,sample_weights)
-        except:
-            weighted_acc = None
         return accuracy, avg_acc, weighted_acc
 
     def _get_metrics(self):
         return {'accuracy': self._accuracy, 'precision': self._precision}
 
 
-    def _get_mean_prediction(self, predictions, y):
+    def _get_mean_prediction(self, predictions, y, emnist = True):
+        n_classes = 10
+        if emnist:
+            n_classes = 62
         score_map = []
-        for i in range(10):
+        for i in range(n_classes):
             c_pred = predictions[y == i]
             m = np.mean(c_pred)
             score_map.append(m)
