@@ -1,7 +1,18 @@
 import tensorflow as tf
 
+"""
+Some helper functions to build networks
+"""
 
 def feed_forward_layer(x, target_size, normalize=False, activation_function=None):
+    """
+    Simple fully-connected network.
+    :param x: input
+    :param target_size: number of neurons
+    :param normalize: should batch norm be used
+    :param activation_function: used activation function
+    :return: the tensor for fully-connected layer
+    """
     print("Forward-Layer:" + str(x.shape))
 
     fan_in = int(x.shape[-1])
@@ -24,6 +35,16 @@ def feed_forward_layer(x, target_size, normalize=False, activation_function=None
 
 
 def conv_layer(x, kernel_quantity, kernel_size, stride_size, normalize=False, activation_function=False):
+    """
+    Builds a convolutional layer.
+    :param x: input
+    :param kernel_quantity: number of filters
+    :param kernel_size: kernel size
+    :param stride_size: stride size
+    :param normalize: should batch norm be applied
+    :param activation_function: the activation function, that should be used. if false, no acivation function would be used
+    :return: a conv layer
+    """
     print("Conv-Layer:" + str(x.shape))
     depth = x.shape[-1]
     fan_in = int(x.shape[1] * x.shape[2])
@@ -44,31 +65,13 @@ def conv_layer(x, kernel_quantity, kernel_size, stride_size, normalize=False, ac
 
     return activation_function(activation) if callable(activation_function) else activation
 
-
-def back_conv_layer(x, target_shape, kernel_size, stride_size, normalize=False, activation_function=False):
-    pass
-
-
-def flatten(x):
-    size = int(np.prod(x.shape[1:]))
-    return tf.reshape(x, [-1, size])
-
-
-def _pop_batch_norm(x, pop_mean, pop_var, offset, scale):
-    return tf.nn.batch_normalization(x, pop_mean, pop_var, offset, scale, 1e-6)
-
-
-def _batch_norm(x, pop_mean, pop_var, mean, var, offset, scale):
-    decay = 0.99
-
-    dependency_1 = tf.assign(pop_mean, pop_mean * decay + mean * (1 - decay))
-    dependency_2 = tf.assign(pop_var, pop_var * decay + var * (1 - decay))
-
-    with tf.control_dependencies([dependency_1, dependency_2]):
-        return tf.nn.batch_normalization(x, mean, var, offset, scale, 1e-6)
-
-
 def batch_norm(x, axes):
+    """
+    Batch norm builder.
+    :param x: input
+    :param axes:
+    :return:
+    """
     depth = x.shape[-1]
     mean, var = tf.nn.moments(x, axes=axes)
 
@@ -85,3 +88,20 @@ def batch_norm(x, axes):
         lambda: _batch_norm(x, pop_mean, pop_var, mean, var, offset, scale),
         lambda: _pop_batch_norm(x, pop_mean, pop_var, offset, scale)
     )
+
+
+def _pop_batch_norm(x, pop_mean, pop_var, offset, scale):
+    return tf.nn.batch_normalization(x, pop_mean, pop_var, offset, scale, 1e-6)
+
+
+def _batch_norm(x, pop_mean, pop_var, mean, var, offset, scale):
+    decay = 0.99
+
+    dependency_1 = tf.assign(pop_mean, pop_mean * decay + mean * (1 - decay))
+    dependency_2 = tf.assign(pop_var, pop_var * decay + var * (1 - decay))
+
+    with tf.control_dependencies([dependency_1, dependency_2]):
+        return tf.nn.batch_normalization(x, mean, var, offset, scale, 1e-6)
+
+
+

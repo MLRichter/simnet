@@ -1,5 +1,5 @@
-from src.simnet.model import AbstractModel
 from src.simnet.layers import *
+from src.simnet.model import AbstractModel
 
 
 class Dumbnet(AbstractModel):
@@ -7,15 +7,6 @@ class Dumbnet(AbstractModel):
         super().__init__()
         self._num_classes = num_classes
         self._init_network()
-
-    def _get_train_step(self):
-        return self._train_step
-
-    def _get_loss(self):
-        return self._loss
-
-    def _build_feed_dict(self, samples, labels):
-        return {self.X1: samples, self.Y: labels}
 
     def _init_network(self):
         # Define the Network Graph
@@ -57,6 +48,21 @@ class Dumbnet(AbstractModel):
                 tf.summary.scalar('acc', self._accuracy)
                 self._merged = tf.summary.merge_all()
 
+    def _get_train_step(self):
+        return self._train_step
+
+    def _get_loss(self):
+        return self._loss
+
+    def _build_feed_dict(self, samples, labels):
+        return {self.X1: samples, self.Y: labels}
+
+    def _get_metrics(self):
+        return {'accuracy': self._accuracy, 'precision': self._precision}
+
+    def _get_summary(self):
+        return self._merged
+
     def _get_siamnese(self, X):
         """
         creates the siamnese stem for the neural network. This is the part both images are send through sequentially
@@ -75,10 +81,6 @@ class Dumbnet(AbstractModel):
         flat = tf.layers.flatten(conv3)
         return flat
 
-    def _get_metrics(self):
-        return {'accuracy': self._accuracy, 'precision': self._precision}
 
-    def _get_summary(self):
-        return self._merged
 
 

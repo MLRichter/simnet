@@ -38,7 +38,7 @@ class SimnetEMNISTController:
     def run(self):
 
         # Define generators
-        data = EMNIST('../../data/emnist/')
+        data = EMNIST('../data/emnist/')
         train = SimnetGenerator(data.get_training_batch, data.get_sizes()[0])
         val = SimnetGenerator(data.get_validation_batch, data.get_sizes()[1])
 
@@ -52,7 +52,7 @@ class SimnetEMNISTController:
             simnet = Simnet()
 
             # Do fitting
-            train_history, val_history = simnet.fit(sess, train, val, 10, 1024, 100)
+            train_history, val_history = simnet.fit(sess, train, val, 100, 1024, 100)
 
             acc, avg_acc, weighted_acc = simnet.evaluate_special(sess, data.get_test_batch, 1024, data.get_classification_samples, data.get_sizes()[2],class_weights=class_weights)
 
