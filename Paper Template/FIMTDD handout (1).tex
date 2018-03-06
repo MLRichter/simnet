@@ -15,31 +15,35 @@ Learning from Dataset with sparse samples for individual classes and high inbala
 \end{abstract}
 
 \section{Task description}
-In most machine learning approaches a large amount of data is key to achieve good or human-level performance in classification task.
-But while large data collections exists for some well-defined problems, in many real world applications the data provided for
-each class is often very small and more or less unbalanced. Furthermore any additional class leads to very expensive retraining of the entire model.
+In most machine learning approaches large amounts of data are key to achieve acceptable or even human-level performance in classification tasks.
 
-To address this issue of missing training data, unbalanced data and the possibility to retrain the entire model,
-a procedure called one-shot classification (Fe-Fei et. al. 2003) can be used. This must be distinguished from zero-shot
-classification in which the model have no access to any sample of the target classes (Palatucci et al., 2009).
+However, in contrast to the plethora of large pre-built data sets that exist for well-defined toy problems, the amount of data available for many real world applications is scarce at best. Other common hurdles are a general lack of class balance within the data and the expensive retraining of the entire model in case more classes are added after the training is complete.
 
-In this work we use a deep neural network proposed in Koch et. al, 2015 called siamese neural network. In order to validate the siamese neural networks
-single shot-classifications performance and the ability to solve the problems of unbalanced data sets we compare the classification
-performance between a simple convolutional neural network and a siamese neural network with the same convolutional network structure on
-the EMNIST.
+To address the issues of small training sets, unbalanced data and the possible need for retraining, Fei-Fei et al. (2003) developed a technique called One-shot Classification, in which the network is only allowed to observe a single sample of each class in the data set before making its prediction. It is important to distinguish this from the concept of Zero-shot Classification, in which the model has no access at all to target class samples (Palatucci et al., 2009).
 
-The EMNIST data set consists of around 700.000 samples of handwritten digits and letters of 62-classes and is fairly unbalanced.
-This gives us a good base to evaluate the classification performance on a unbalanced data set and compare this performance to classical approaches
-used in the deep learning community.
+In this project we replicate the deep neural network proposed in Koch et. al, 2015 called Siamese Neural Network. To validate its one-shot classifications potential and its ability to solve problems containing unbalanced data sets we compare the classification performance of a simple convolutional neural network and a siamese neural network with the same convolutional network structure.
+
+In order to properly examine the performance, we chose to use the EMNIST (Extended MNIST) data set as proposed by Cohen et al. in 2017. It consists of around 700,000 images of handwritten digits and letters of 62 classes and is fairly unbalanced. This provides a more solid base to evaluate classification performance on an unbalanced data set rather than using MNIST, and to compare this performance to classical approaches used in the deep learning community. We decided against using the original Omniglot data set for simplicitys sake.
 
 \section{Related work and similar approaches}
-According to Koch et. al., 2015, one-shot classification research is fairly immature and not much discussed in the deep learning
-community. The first work goes back to the early 2000's done by Li Fei-Fei et al. They were developing a variational Bayesian framework for one-shot
-classification that have good generalization properties with very few examples on unseen classes if the network is trained on other classes before (Fe-Fei et al., 2003; Fei-Fei et al., 2006).
+According to Koch et al. (2015), research into one-shot classification is still in its infancy and not of particular import to the deep learning community.
 
+The cornerstone paper of one-shot learning dates back to the early 2000's by Li Fei-Fei et al. They developed a Bayesian framework for one-shot classification that used previously learned classes to help forecast future ones, which displayed strong generalization properties when applied to classes with acutely low sample sizes. (Fei-Fei et al., 2003; Fei-Fei et al., 2006).
 
+In a few more contemporary papers, Lake et al. came up with a method called Hierarchical Bayesian Program Learning (2011; 2012; 2013), a technique for one-shot character recognition that achieves human-level performance by representing learned concepts that best explain observed examples under a Bayesian criterion. Another approach they designed uses a generative Hierarchical Hidden Markov model in combination with a Bayesian inference procedure to recognize spoken words from unknown speakers (2014).
+
+Other than image classification, the application of one-shot learning has also been considered in other transfer learning approaches. Maas and Kemp used Bayesian networks to predict passenger attributes for historic Ellis Island travel data (2009), Wu and Dennis applied it to path-planning algorithms of robotic actuation (2012) and Lim tried to model human-level concept extraction for data sets with very small class sample sizes by creating an adaptive measure of how much each learned category should be weighted by each training sample in the loss function (2012).
+
+Very few alternatives to the Bayesian One-shot Learning approach exist currently. A notably different approach presented by Miller et al at ICCV 2000 incorporates knowledge transfer via model parameters to learn new object categories which are visually similar to previously learned categories.
 
 \section{Theoretical basis and used procedures}
+In one-shot classification the model learns to distingush between the class-identity of image pairs, which is called standard verification task for image recognition (Koch et. al., 2015). This means that the model classify pairs of images whether they belong to the same or a different class according to the probabalistic output of the model. In addition if samples of new classes arise the same model can be used to classify those new samples (Koch et. al., 2015). In the original paper the authors new samples would be paired with known samples, one per class, and the paring with the highest score is then selected as the pair with the highest probability and the class of the known sample is used as class for the new sample. We altered this approach such that we present more than one known sample of one class and average over those groupings of pairs such that we can select the pairing with the highest average probability.
+
+First introduction of siamnese neural networks dated back to the early 1990s by Bromley and LeCun to tackle the task of signature verification. A twin neural network with shared parameters and architecture is the main building block of a siamese neural network. It accepts two distinct inputs and the output is joined by an energy function. The approximate function computes the distance between the two high level feature representation of the inputs. Each part of the twin neural network projects the input into an projection feature space. To prevent that two equal inputs into the two different parts of the twin network would be projected into two different regions of the feature vector space, the weights are shared betweeen the two parts of the network. Furthermore the network is symmetric such that the computed metric will be equal independet from which input network is used for the pair of inputs.
+
+For the energy function multiple approaches exists. LeCun et al. used a contrastive energy function which basically descrease the energy of sample pairs of the same class and increase the energy of those of different classes. Koch et al. used the L1-distance between the two twin network respective outputs $h1$ and $h2$ combined with a sigmoid activation which leads to using the sigmoidal cross entropy.
+
+Equal to Koch et al. our models use multiple convolutional layers before the fully-connected layers and the energy function. Convolutional layers are a good fit because they achieved very good performance in image recognition task. Furthermore they are able to reduce the number of free parameters because of the local connectivity properties of convolutional layers and learn an high level feature representation of the image which could rules out the problems of the "Curse of dimensionality" because the number of input features in the fully-connected layers will be reduced. In addition the model may be not that sensible to outliers and transformations of the input image because it groups the single pixel values to the high level features mentioned above (Koch et al., 2015).
 
 \subsection{Siamese Neural Networks}
 
